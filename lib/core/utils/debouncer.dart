@@ -2,6 +2,7 @@ import 'dart:async';
 
 final class Debouncer {
   Debouncer(this.duration);
+
   final Duration duration;
   Timer? _timer;
 

@@ -1,6 +1,10 @@
 # ShopKart
 
-ShopKart is a production-ready Flutter e-commerce application built with Clean Architecture, MVVM, Riverpod, Dio, Retrofit, Hive, and Material 3. The app uses the [Fake Store API](https://fakestoreapi.com) and is structured to demonstrate the kind of maintainable, scalable codebase expected in a professional Flutter portfolio or Android developer interview.
+ShopKart is a production-ready Flutter e-commerce application built with Clean Architecture, MVVM,
+Riverpod, Dio, Retrofit, Hive, and Material 3. The app uses
+the [Fake Store API](https://fakestoreapi.com) and is structured to demonstrate the kind of
+maintainable, scalable codebase expected in a professional Flutter portfolio or Android developer
+interview.
 
 ## Highlights
 
@@ -21,7 +25,9 @@ ShopKart is a production-ready Flutter e-commerce application built with Clean A
 
 ## Architecture
 
-ShopKart follows Clean Architecture and MVVM. UI widgets observe Riverpod ViewModels, ViewModels call use cases or repositories, repositories coordinate remote/local data sources, and domain entities remain independent from framework-specific implementation details.
+ShopKart follows Clean Architecture and MVVM. UI widgets observe Riverpod ViewModels, ViewModels
+call use cases or repositories, repositories coordinate remote/local data sources, and domain
+entities remain independent from framework-specific implementation details.
 
 ```mermaid
 flowchart LR
@@ -236,7 +242,8 @@ Example Markdown:
 
 ## Interview Talking Points
 
-- The app separates business rules from UI and data access, making repositories and use cases easy to test.
+- The app separates business rules from UI and data access, making repositories and use cases easy
+  to test.
 - Riverpod keeps state explicit and composable without tightly coupling widgets to service classes.
 - Repository implementations gracefully fall back to local Hive cache when network calls fail.
 - Cart, wishlist, theme, and auth state persist locally for a better user experience.
@@ -267,4 +274,5 @@ docs: document architecture setup and features
 
 ## License
 
-This project is intended for portfolio and learning purposes. Add your preferred license before publishing it publicly.
+This project is intended for portfolio and learning purposes. Add your preferred license before
+publishing it publicly.

@@ -4,6 +4,7 @@ abstract final class AppTheme {
   static const _seed = Color(0xff0f766e);
 
   static ThemeData light() => _theme(Brightness.light);
+
   static ThemeData dark() => _theme(Brightness.dark);
 
   static ThemeData _theme(Brightness brightness) {

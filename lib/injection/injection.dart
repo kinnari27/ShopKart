@@ -9,6 +9,9 @@ import 'package:shop_kart/features/cart/data/repositories/cart_repository_impl.d
 import 'package:shop_kart/features/cart/domain/repositories/cart_repository.dart';
 import 'package:shop_kart/features/product/data/repositories/product_repository_impl.dart';
 import 'package:shop_kart/features/product/domain/repositories/product_repository.dart';
+import 'package:shop_kart/features/product/domain/usecases/get_categories.dart';
+import 'package:shop_kart/features/product/domain/usecases/get_product_detail.dart';
+import 'package:shop_kart/features/product/domain/usecases/get_products.dart';
 import 'package:shop_kart/features/wishlist/data/repositories/wishlist_repository_impl.dart';
 import 'package:shop_kart/features/wishlist/domain/repositories/wishlist_repository.dart';
 import 'package:shop_kart/shared/data/datasources/product_local_data_source.dart';
@@ -36,6 +39,9 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<ProductRepository>(
       () => ProductRepositoryImpl(sl(), sl()),
     )
+    ..registerLazySingleton<GetProducts>(() => GetProducts(sl()))
+    ..registerLazySingleton<GetCategories>(() => GetCategories(sl()))
+    ..registerLazySingleton<GetProductDetail>(() => GetProductDetail(sl()))
     ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()))
     ..registerLazySingleton<CartRepository>(() => CartRepositoryImpl(cartBox))
     ..registerLazySingleton<WishlistRepository>(

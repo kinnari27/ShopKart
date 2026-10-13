@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:shop_kart/shared/domain/entities/product.dart';
 
-class CartItem {
+class CartItem extends Equatable {
   const CartItem({required this.product, required this.quantity});
 
   final Product product;
@@ -12,4 +13,7 @@ class CartItem {
     product: product ?? this.product,
     quantity: quantity ?? this.quantity,
   );
+
+  @override
+  List<Object?> get props => [product, quantity];
 }

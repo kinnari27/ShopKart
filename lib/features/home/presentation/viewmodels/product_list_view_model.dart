@@ -2,10 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shop_kart/core/constants/api_constants.dart';
 import 'package:shop_kart/features/home/presentation/viewmodels/product_list_state.dart';
 import 'package:shop_kart/features/product/domain/repositories/product_repository.dart';
+import 'package:shop_kart/features/product/domain/usecases/get_categories.dart';
+import 'package:shop_kart/features/product/domain/usecases/get_products.dart';
 import 'package:shop_kart/injection/injection.dart';
 import 'package:shop_kart/shared/domain/entities/product.dart';
 
 final productRepositoryProvider = Provider<ProductRepository>((ref) => sl());
+final getProductsUseCaseProvider = Provider<GetProducts>((ref) => sl());
+final getCategoriesUseCaseProvider = Provider<GetCategories>((ref) => sl());
 
 final productListViewModelProvider =
     AsyncNotifierProvider<ProductListViewModel, ProductListState>(
@@ -13,12 +17,13 @@ final productListViewModelProvider =
     );
 
 class ProductListViewModel extends AsyncNotifier<ProductListState> {
-  ProductRepository get _repository => ref.read(productRepositoryProvider);
+  GetProducts get _getProducts => ref.read(getProductsUseCaseProvider);
+  GetCategories get _getCategories => ref.read(getCategoriesUseCaseProvider);
 
   @override
   Future<ProductListState> build() async {
-    final categories = await _repository.getCategories();
-    final products = await _repository.getProducts();
+    final categories = await _getCategories();
+    final products = await _getProducts();
     return _buildState(products: products, categories: categories);
   }
 
@@ -26,10 +31,10 @@ class ProductListViewModel extends AsyncNotifier<ProductListState> {
     final current = state.value ?? const ProductListState();
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final products = await _repository.getProducts(
+      final products = await _getProducts(
         category: current.selectedCategory,
       );
-      final categories = await _repository.getCategories();
+      final categories = await _getCategories();
       return _buildState(
         products: products,
         categories: categories,
@@ -45,7 +50,7 @@ class ProductListViewModel extends AsyncNotifier<ProductListState> {
       current.copyWith(isLoading: true, selectedCategory: category),
     );
     state = await AsyncValue.guard(() async {
-      final products = await _repository.getProducts(category: category);
+      final products = await _getProducts(category: category);
       return _buildState(
         products: products,
         categories: current.categories,

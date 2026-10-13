@@ -10,6 +10,16 @@ final cartViewModelProvider = NotifierProvider<CartViewModel, List<CartItem>>(
   CartViewModel.new,
 );
 
+final cartTotalProvider = Provider<double>((ref) {
+  final items = ref.watch(cartViewModelProvider);
+  return items.fold(0.0, (sum, item) => sum + item.total);
+});
+
+final cartItemCountProvider = Provider<int>((ref) {
+  final items = ref.watch(cartViewModelProvider);
+  return items.fold(0, (sum, item) => sum + item.quantity);
+});
+
 class CartViewModel extends Notifier<List<CartItem>> {
   CartRepository get _repository => ref.read(cartRepositoryProvider);
 
@@ -30,6 +40,11 @@ class CartViewModel extends Notifier<List<CartItem>> {
 
   Future<void> updateQuantity(int productId, int quantity) async {
     await _repository.updateQuantity(productId, quantity);
+    state = _repository.getItems();
+  }
+
+  Future<void> clear() async {
+    await _repository.clear();
     state = _repository.getItems();
   }
 }

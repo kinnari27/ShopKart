@@ -22,5 +22,14 @@ class Product extends Equatable {
   final int ratingCount;
 
   @override
-  List<Object?> get props => [id, title, price, category];
+  List<Object?> get props => [
+    id,
+    title,
+    price,
+    description,
+    category,
+    image,
+    rating,
+    ratingCount,
+  ];
 }

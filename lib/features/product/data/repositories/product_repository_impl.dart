@@ -20,7 +20,7 @@ class ProductRepositoryImpl implements ProductRepository {
       await _local.cacheProducts(products);
       return products;
     } on DioException catch (_) {
-      return _local.getCachedProducts();
+      return _local.getCachedProducts(category: category);
     } on CacheException {
       rethrow;
     } catch (error) {
@@ -31,10 +31,18 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Product> getProduct(int id) async {
     try {
-      return await _remote.getProduct(id);
+      final product = await _remote.getProduct(id);
+      await _local.cacheProducts([product]);
+      return product;
     } catch (error) {
-      final cached = _local.getCachedProducts();
-      return cached.firstWhere((product) => product.id == id);
+      try {
+        final cached = _local.getCachedProducts();
+        final match = cached.where((product) => product.id == id).firstOrNull;
+        if (match != null) {
+          return match;
+        }
+      } catch (_) {}
+      throw NetworkException('Product not found: $error');
     }
   }
 

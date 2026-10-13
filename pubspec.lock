@@ -318,14 +318,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.3"
-  flutter_staggered_grid_view:
-    dependency: transitive
-    description:
-      name: flutter_staggered_grid_view
-      sha256: "19e7abb550c96fbfeb546b23f3ff356ee7c59a019a651f8f102a4ba9b7349395"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -336,30 +328,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  freezed:
-    dependency: "direct dev"
-    description:
-      name: freezed
-      sha256: f23ea33b3863f119b58ed1b586e881a46bd28715ddcc4dbc33104524e3434131
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.5"
-  freezed_annotation:
-    dependency: "direct main"
-    description:
-      name: freezed_annotation
-      sha256: "7294967ff0a6d98638e7acb774aac3af2550777accd8149c90af5b014e6d44d8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
-  frontend_server_client:
-    dependency: transitive
-    description:
-      name: frontend_server_client
-      sha256: "404dbf9bce29beafbe9dcb19219447b6f7d49900cd42b8d3b7af102b24508e25"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
   get_it:
     dependency: "direct main"
     description:
@@ -416,14 +384,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-  hotreloader:
-    dependency: transitive
-    description:
-      name: hotreloader
-      sha256: "66871df468fc24eee81f1a0a7cb98acc104716f9b7376d355437b48d633c4ebf"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.4.0"
   html:
     dependency: transitive
     description:
@@ -464,30 +424,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.12.0"
-  infinite_scroll_pagination:
-    dependency: "direct main"
-    description:
-      name: infinite_scroll_pagination
-      sha256: b0d28e37cd8f62490ff6aef63f9db93d4c78b7f11b7c6b26f33c69d8476fda78
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.1"
-  injectable:
-    dependency: "direct main"
-    description:
-      name: injectable
-      sha256: "32b36a9d87f18662bee0b1951b81f47a01f2bf28cd6ea94f60bc5453c7bf598c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.1+4"
-  injectable_generator:
-    dependency: "direct dev"
-    description:
-      name: injectable_generator
-      sha256: fcc0d1edcef2c863dec846b0dec27cb2390d9e9b62e61da5cfc2b9a06b9533c2
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.12.1"
   io:
     dependency: transitive
     description:
@@ -560,14 +496,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  lean_builder:
-    dependency: transitive
-    description:
-      name: lean_builder
-      sha256: c16e95ddf7b2d49dd551357b7212fe2ce9f13ec7ad1b1e660c157184031e96c0
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.10"
   lints:
     dependency: transitive
     description:
@@ -776,14 +704,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.0"
-  recase:
-    dependency: transitive
-    description:
-      name: recase
-      sha256: e4eb4ec2dcdee52dcf99cb4ceabaffc631d7424ee55e56f280bc039737f89213
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
   record_use:
     dependency: transitive
     description:
@@ -909,14 +829,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  sliver_tools:
-    dependency: transitive
-    description:
-      name: sliver_tools
-      sha256: eae28220badfb9d0559207badcbbc9ad5331aac829a88cb0964d330d2a4636a6
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.12"
   source_gen:
     dependency: transitive
     description:
@@ -1133,14 +1045,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.1.0"
-  xxh3:
-    dependency: transitive
-    description:
-      name: xxh3
-      sha256: "399a0438f5d426785723c99da6b16e136f4953fb1e9db0bf270bd41dd4619916"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   yaml:
     dependency: transitive
     description:

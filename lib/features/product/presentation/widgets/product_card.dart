@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shop_kart/core/widgets/shimmer_box.dart';
 import 'package:shop_kart/features/wishlist/presentation/viewmodels/wishlist_view_model.dart';
 import 'package:shop_kart/shared/domain/entities/product.dart';
 
@@ -12,8 +13,11 @@ class ProductCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wishlist = ref.watch(wishlistViewModelProvider);
-    final isFavorite = wishlist.any((item) => item.id == product.id);
+    final isFavorite = ref.watch(
+      wishlistViewModelProvider.select(
+        (items) => items.any((item) => item.id == product.id),
+      ),
+    );
     final colors = Theme.of(context).colorScheme;
 
     return Card(
@@ -34,6 +38,15 @@ class ProductCard extends ConsumerWidget {
                         child: CachedNetworkImage(
                           imageUrl: product.image,
                           fit: BoxFit.contain,
+                          placeholder: (context, url) =>
+                              const ShimmerBox(height: double.infinity),
+                          errorWidget: (context, url, error) => Center(
+                            child: Icon(
+                              Icons.broken_image_outlined,
+                              size: 40,
+                              color: colors.outlineVariant,
+                            ),
+                          ),
                         ),
                       ),
                     ),

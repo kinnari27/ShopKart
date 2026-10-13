@@ -13,7 +13,10 @@ class ProductLocalDataSource {
   final Box<List> _listBox;
 
   Future<void> cacheProducts(List<ProductModel> products) async {
-    await _listBox.put('ids', products.map((product) => product.id).toList());
+    final rawIds = _listBox.get('ids', defaultValue: const <dynamic>[]) ?? const [];
+    final existingIds = rawIds.map((e) => e as int).toSet();
+    existingIds.addAll(products.map((product) => product.id));
+    await _listBox.put('ids', existingIds.toList());
     for (final product in products) {
       await _productBox.put(product.id, product.toJson());
     }
@@ -22,8 +25,9 @@ class ProductLocalDataSource {
   Future<void> cacheCategories(List<String> categories) =>
       _listBox.put('categories', categories);
 
-  List<ProductModel> getCachedProducts() {
-    final ids = _listBox.get('ids', defaultValue: const <int>[]) ?? const [];
+  List<ProductModel> getCachedProducts({String? category}) {
+    final rawIds = _listBox.get('ids', defaultValue: const <dynamic>[]) ?? const [];
+    final ids = rawIds.map((e) => e as int).toList();
     final products = ids
         .map((id) => _productBox.get(id))
         .whereType<Map>()
@@ -31,6 +35,15 @@ class ProductLocalDataSource {
         .toList();
     if (products.isEmpty) {
       throw const CacheException('No cached products available.');
+    }
+    if (category != null && category != 'All') {
+      final filtered = products
+          .where((p) => p.category.toLowerCase() == category.toLowerCase())
+          .toList();
+      if (filtered.isEmpty) {
+        throw CacheException('No cached products available for category: $category');
+      }
+      return filtered;
     }
     return products;
   }

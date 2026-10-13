@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shop_kart/core/errors/app_exception.dart';
 import 'package:shop_kart/features/auth/presentation/viewmodels/auth_view_model.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -16,69 +17,135 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _confirm = TextEditingController();
+  bool _isPasswordVisible = false;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _password.dispose();
+    _confirm.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authViewModelProvider);
-    ref.listen(authViewModelProvider, (_, next) {
-      if (next.value != null) context.go('/home');
+    ref.listen(authViewModelProvider, (previous, next) {
+      if (next.hasError) {
+        final error = next.error;
+        final message =
+            error is AppException ? error.message : error.toString();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      } else if (next.value != null) {
+        context.go('/home');
+      }
     });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Create account')),
       body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: _name,
-                    decoration: const InputDecoration(labelText: 'Name'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _email,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _password,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Password'),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _confirm,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm password',
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextFormField(
+                      controller: _name,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Name',
+                        prefixIcon: Icon(Icons.person_outline),
+                      ),
+                      validator: (value) =>
+                          (value?.trim().length ?? 0) >= 2
+                              ? null
+                              : 'Name must be at least 2 characters',
                     ),
-                    validator: (value) => value == _password.text
-                        ? null
-                        : 'Passwords do not match',
-                  ),
-                  const SizedBox(height: 20),
-                  FilledButton(
-                    onPressed: auth.isLoading
-                        ? null
-                        : () {
-                            if (_formKey.currentState!.validate()) {
-                              ref
-                                  .read(authViewModelProvider.notifier)
-                                  .register(
-                                    _name.text,
-                                    _email.text,
-                                    _password.text,
-                                  );
-                            }
-                          },
-                    child: const Text('Register'),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _email,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                      validator: (value) =>
+                          value != null && value.trim().contains('@')
+                              ? null
+                              : 'Enter a valid email address',
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _password,
+                      obscureText: !_isPasswordVisible,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                          onPressed: () => setState(
+                            () => _isPasswordVisible = !_isPasswordVisible,
+                          ),
+                        ),
+                      ),
+                      validator: (value) => (value?.length ?? 0) >= 6
+                          ? null
+                          : 'Minimum 6 characters',
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _confirm,
+                      obscureText: !_isPasswordVisible,
+                      textInputAction: TextInputAction.done,
+                      decoration: const InputDecoration(
+                        labelText: 'Confirm password',
+                        prefixIcon: Icon(Icons.lock_reset_outlined),
+                      ),
+                      validator: (value) => value == _password.text
+                          ? null
+                          : 'Passwords do not match',
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton(
+                      onPressed: auth.isLoading
+                          ? null
+                          : () {
+                              if (_formKey.currentState!.validate()) {
+                                ref
+                                    .read(authViewModelProvider.notifier)
+                                    .register(
+                                      _name.text.trim(),
+                                      _email.text.trim(),
+                                      _password.text,
+                                    );
+                              }
+                            },
+                      child: auth.isLoading
+                          ? const SizedBox.square(
+                              dimension: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Register'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

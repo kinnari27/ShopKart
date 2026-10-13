@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:shop_kart/shared/domain/entities/product.dart';
 
-class ProductListState {
+class ProductListState extends Equatable {
   const ProductListState({
     this.products = const [],
     this.visibleProducts = const [],
@@ -46,4 +47,17 @@ class ProductListState {
       error: error,
     );
   }
+
+  @override
+  List<Object?> get props => [
+    products,
+    visibleProducts,
+    categories,
+    selectedCategory,
+    query,
+    page,
+    isLoading,
+    hasMore,
+    error,
+  ];
 }

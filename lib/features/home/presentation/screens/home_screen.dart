@@ -42,9 +42,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(title: const Text('ShopKart')),
       body: state.when(
         loading: () => const _HomeSkeleton(),
-        error: (error, _) => AppEmptyState(
-          title: 'Something went wrong',
-          message: error.toString(),
+        error: (error, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline_rounded,
+                  size: 54,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Something went wrong',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  error.toString(),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 20),
+                FilledButton.icon(
+                  onPressed: () =>
+                      ref.read(productListViewModelProvider.notifier).refresh(),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Try Again'),
+                ),
+              ],
+            ),
+          ),
         ),
         data: (data) => RefreshIndicator(
           onRefresh: () =>

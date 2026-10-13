@@ -50,14 +50,17 @@ class CartScreen extends ConsumerWidget {
                         onPressed: () => ref
                             .read(cartViewModelProvider.notifier)
                             .updateQuantity(item.product.id, item.quantity - 1),
-                        icon: const Icon(Icons.remove),
+                        icon: const Icon(Icons.remove_circle_outline_rounded),
                       ),
-                      Text('${item.quantity}'),
+                      Text(
+                        '${item.quantity}',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                       IconButton(
                         onPressed: () => ref
                             .read(cartViewModelProvider.notifier)
                             .updateQuantity(item.product.id, item.quantity + 1),
-                        icon: const Icon(Icons.add),
+                        icon: const Icon(Icons.add_circle_outline_rounded),
                       ),
                     ],
                   ),

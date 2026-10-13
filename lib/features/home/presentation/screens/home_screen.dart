@@ -57,8 +57,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 sliver: SliverToBoxAdapter(
                   child: TextField(
                     decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Search products',
+                      prefixIcon: Icon(Icons.search_rounded),
+                      hintText: 'Search products...',
                     ),
                     onChanged: (value) => _debouncer.run(
                       () => ref

@@ -78,19 +78,23 @@ class AppShell extends StatelessWidget {
             context.go(['/home', '/cart', '/wishlist', '/profile'][value]),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.storefront_outlined),
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.shopping_cart_outlined),
+            icon: Icon(Icons.shopping_bag_outlined),
+            selectedIcon: Icon(Icons.shopping_bag),
             label: 'Cart',
           ),
           NavigationDestination(
-            icon: Icon(Icons.favorite_border),
+            icon: Icon(Icons.favorite_outline),
+            selectedIcon: Icon(Icons.favorite),
             label: 'Wishlist',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],

@@ -48,12 +48,19 @@ class ProductDetailScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.star_rounded),
+                Icon(
+                  Icons.star_rounded,
+                  color: Theme.of(context).colorScheme.tertiary,
+                ),
+                const SizedBox(width: 4),
                 Text('${product.rating} (${product.ratingCount})'),
                 const Spacer(),
                 Text(
                   '\$${product.price.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
@@ -65,10 +72,10 @@ class ProductDetailScreen extends ConsumerWidget {
                 ref.read(cartViewModelProvider.notifier).add(product);
                 ScaffoldMessenger.of(
                   context,
-                ).showSnackBar(const SnackBar(content: Text('Added to cart')));
+                ).showSnackBar(const SnackBar(content: Text('Added to bag')));
               },
-              icon: const Icon(Icons.shopping_cart_outlined),
-              label: const Text('Add to cart'),
+              icon: const Icon(Icons.shopping_bag_outlined),
+              label: const Text('Add to bag'),
             ),
           ],
         ),

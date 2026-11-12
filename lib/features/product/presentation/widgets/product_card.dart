@@ -1,29 +1,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import 'package:shop_kart/core/routing/app_routes.dart';
 import 'package:shop_kart/core/widgets/shimmer_box.dart';
-import 'package:shop_kart/features/wishlist/presentation/viewmodels/wishlist_view_model.dart';
+import 'package:shop_kart/features/wishlist/presentation/controllers/wishlist_controller.dart';
 import 'package:shop_kart/shared/domain/entities/product.dart';
 
-class ProductCard extends ConsumerWidget {
+class ProductCard extends StatelessWidget {
   const ProductCard({required this.product, super.key});
 
   final Product product;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isFavorite = ref.watch(
-      wishlistViewModelProvider.select(
-        (items) => items.any((item) => item.id == product.id),
-      ),
-    );
+  Widget build(BuildContext context) {
+    final wishlistController = Get.find<WishlistController>();
     final colors = Theme.of(context).colorScheme;
 
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.push('/product/${product.id}'),
+        onTap: () => Get.toNamed(AppRoutes.product(product.id)),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -52,15 +48,17 @@ class ProductCard extends ConsumerWidget {
                     ),
                     Align(
                       alignment: Alignment.topRight,
-                      child: IconButton.filledTonal(
-                        tooltip: 'Wishlist',
-                        onPressed: () => ref
-                            .read(wishlistViewModelProvider.notifier)
-                            .toggle(product),
-                        icon: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                        ),
-                      ),
+                      child: Obx(() {
+                        final isFavorite =
+                            wishlistController.contains(product.id);
+                        return IconButton.filledTonal(
+                          tooltip: 'Wishlist',
+                          onPressed: () => wishlistController.toggle(product),
+                          icon: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                          ),
+                        );
+                      }),
                     ),
                   ],
                 ),

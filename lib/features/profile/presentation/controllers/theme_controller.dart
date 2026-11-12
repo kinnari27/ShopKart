@@ -9,15 +9,11 @@ class ThemeController extends GetxController {
   final SharedPreferences _preferences;
 
   ThemeController({SharedPreferences? preferences})
-      : _preferences = preferences ?? sl<SharedPreferences>();
-
-  final Rx<ThemeMode> themeMode = ThemeMode.system.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
+      : _preferences = preferences ?? sl<SharedPreferences>() {
     _loadTheme();
   }
+
+  final Rx<ThemeMode> themeMode = ThemeMode.system.obs;
 
   void _loadTheme() {
     final value = _preferences.getString('theme_mode') ?? 'system';

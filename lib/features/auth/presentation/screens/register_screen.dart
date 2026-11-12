@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:shop_kart/core/errors/app_exception.dart';
-import 'package:shop_kart/features/auth/presentation/viewmodels/auth_view_model.dart';
+import 'package:get/get.dart';
+import 'package:shop_kart/features/auth/presentation/controllers/auth_controller.dart';
 
-class RegisterScreen extends ConsumerStatefulWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _email = TextEditingController();
@@ -30,22 +28,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = ref.watch(authViewModelProvider);
-    ref.listen(authViewModelProvider, (previous, next) {
-      if (next.hasError) {
-        final error = next.error;
-        final message =
-            error is AppException ? error.message : error.toString();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      } else if (next.value != null) {
-        context.go('/home');
-      }
-    });
+    final authController = Get.find<AuthController>();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Create account')),
@@ -123,26 +106,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           : 'Passwords do not match',
                     ),
                     const SizedBox(height: 20),
-                    FilledButton(
-                      onPressed: auth.isLoading
-                          ? null
-                          : () {
-                              if (_formKey.currentState!.validate()) {
-                                ref
-                                    .read(authViewModelProvider.notifier)
-                                    .register(
-                                      _name.text.trim(),
-                                      _email.text.trim(),
-                                      _password.text,
-                                    );
-                              }
-                            },
-                      child: auth.isLoading
-                          ? const SizedBox.square(
-                              dimension: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Register'),
+                    Obx(
+                      () => FilledButton(
+                        onPressed: authController.isLoading.value
+                            ? null
+                            : () {
+                                if (_formKey.currentState!.validate()) {
+                                  authController.register(
+                                    _name.text.trim(),
+                                    _email.text.trim(),
+                                    _password.text,
+                                  );
+                                }
+                              },
+                        child: authController.isLoading.value
+                            ? const SizedBox.square(
+                                dimension: 18,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('Register'),
+                      ),
                     ),
                   ],
                 ),

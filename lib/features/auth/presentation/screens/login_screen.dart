@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:shop_kart/core/errors/app_exception.dart';
-import 'package:shop_kart/features/auth/presentation/viewmodels/auth_view_model.dart';
+import 'package:get/get.dart';
+import 'package:shop_kart/core/routing/app_routes.dart';
+import 'package:shop_kart/features/auth/presentation/controllers/auth_controller.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController(text: 'demo@shopkart.dev');
   final _password = TextEditingController(text: 'password');
@@ -26,22 +25,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = ref.watch(authViewModelProvider);
-    ref.listen(authViewModelProvider, (previous, next) {
-      if (next.hasError) {
-        final error = next.error;
-        final message =
-            error is AppException ? error.message : error.toString();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      } else if (next.value != null) {
-        context.go('/home');
-      }
-    });
+    final authController = Get.find<AuthController>();
 
     return Scaffold(
       body: SafeArea(
@@ -95,8 +79,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
+                                   ? Icons.visibility_off_outlined
+                                   : Icons.visibility_outlined,
                             ),
                             onPressed: () => setState(
                               () => _isPasswordVisible = !_isPasswordVisible,
@@ -108,25 +92,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             : 'Minimum 6 characters',
                       ),
                       const SizedBox(height: 20),
-                      FilledButton(
-                        onPressed: auth.isLoading
-                            ? null
-                            : () {
-                                if (_formKey.currentState!.validate()) {
-                                  ref
-                                      .read(authViewModelProvider.notifier)
-                                      .login(_email.text.trim(), _password.text);
-                                }
-                              },
-                        child: auth.isLoading
-                            ? const SizedBox.square(
-                                dimension: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text('Login'),
+                      Obx(
+                        () => FilledButton(
+                          onPressed: authController.isLoading.value
+                              ? null
+                              : () {
+                                  if (_formKey.currentState!.validate()) {
+                                    authController.login(
+                                      _email.text.trim(),
+                                      _password.text,
+                                    );
+                                  }
+                                },
+                          child: authController.isLoading.value
+                              ? const SizedBox.square(
+                                  dimension: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Text('Login'),
+                        ),
                       ),
                       TextButton(
-                        onPressed: () => context.go('/register'),
+                        onPressed: () => Get.toNamed(AppRoutes.register),
                         child: const Text('Create account'),
                       ),
                     ],

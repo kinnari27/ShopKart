@@ -1,16 +1,15 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shop_kart/features/cart/domain/entities/cart_item.dart';
 import 'package:shop_kart/features/cart/domain/repositories/cart_repository.dart';
-import 'package:shop_kart/features/cart/presentation/viewmodels/cart_view_model.dart';
+import 'package:shop_kart/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:shop_kart/shared/domain/entities/product.dart';
 
 class MockCartRepository extends Mock implements CartRepository {}
 
 void main() {
   late MockCartRepository mockRepository;
-  late ProviderContainer container;
+  late CartController controller;
 
   const tProduct = Product(
     id: 1,
@@ -28,32 +27,20 @@ void main() {
   setUp(() {
     mockRepository = MockCartRepository();
     when(() => mockRepository.getItems()).thenReturn([tCartItem]);
-
-    container = ProviderContainer(
-      overrides: [
-        cartRepositoryProvider.overrideWithValue(mockRepository),
-      ],
-    );
+    controller = CartController(repository: mockRepository);
   });
 
-  tearDown(() {
-    container.dispose();
-  });
-
-  test('build should return initial items from repository', () {
-    final items = container.read(cartViewModelProvider);
-    expect(items, [tCartItem]);
+  test('onInit should return initial items from repository', () {
+    expect(controller.items, [tCartItem]);
     verify(() => mockRepository.getItems()).called(1);
   });
 
-  test('cartTotalProvider should calculate sum of total for all items', () {
-    final total = container.read(cartTotalProvider);
-    expect(total, 50.0);
+  test('total should calculate sum of total for all items', () {
+    expect(controller.total, 50.0);
   });
 
-  test('cartItemCountProvider should calculate total quantity of all items', () {
-    final count = container.read(cartItemCountProvider);
-    expect(count, 2);
+  test('itemCount should calculate total quantity of all items', () {
+    expect(controller.itemCount, 2);
   });
 
   test('add should delegate to repository and update state', () async {
@@ -62,10 +49,9 @@ void main() {
       tCartItem.copyWith(quantity: 3),
     ]);
 
-    await container.read(cartViewModelProvider.notifier).add(tProduct);
+    await controller.add(tProduct);
 
-    final items = container.read(cartViewModelProvider);
-    expect(items.first.quantity, 3);
+    expect(controller.items.first.quantity, 3);
     verify(() => mockRepository.add(tProduct)).called(1);
   });
 
@@ -73,10 +59,9 @@ void main() {
     when(() => mockRepository.remove(1)).thenAnswer((_) async {});
     when(() => mockRepository.getItems()).thenReturn([]);
 
-    await container.read(cartViewModelProvider.notifier).remove(1);
+    await controller.remove(1);
 
-    final items = container.read(cartViewModelProvider);
-    expect(items, isEmpty);
+    expect(controller.items, isEmpty);
     verify(() => mockRepository.remove(1)).called(1);
   });
 
@@ -86,10 +71,9 @@ void main() {
       tCartItem.copyWith(quantity: 4),
     ]);
 
-    await container.read(cartViewModelProvider.notifier).updateQuantity(1, 4);
+    await controller.updateQuantity(1, 4);
 
-    final items = container.read(cartViewModelProvider);
-    expect(items.first.quantity, 4);
+    expect(controller.items.first.quantity, 4);
     verify(() => mockRepository.updateQuantity(1, 4)).called(1);
   });
 
@@ -97,10 +81,9 @@ void main() {
     when(() => mockRepository.clear()).thenAnswer((_) async {});
     when(() => mockRepository.getItems()).thenReturn([]);
 
-    await container.read(cartViewModelProvider.notifier).clear();
+    await controller.clear();
 
-    final items = container.read(cartViewModelProvider);
-    expect(items, isEmpty);
+    expect(controller.items, isEmpty);
     verify(() => mockRepository.clear()).called(1);
   });
 }

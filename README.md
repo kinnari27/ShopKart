@@ -1,7 +1,7 @@
 # ShopKart
 
 ShopKart is a production-ready Flutter e-commerce application built with Clean Architecture, MVVM,
-Riverpod, Dio, Retrofit, Hive, and Material 3. The app uses
+GetX, Dio, Retrofit, Hive, and Material 3. The app uses
 the [Fake Store API](https://fakestoreapi.com) and is structured to demonstrate the kind of
 maintainable, scalable codebase expected in a professional Flutter portfolio or Android developer
 interview.
@@ -10,7 +10,7 @@ interview.
 
 - Clean Architecture with clear presentation, domain, and data boundaries
 - Feature-based folder structure for auth, home, product, cart, wishlist, and profile
-- Riverpod ViewModels for predictable state management
+- GetX Controllers for reactive state management, routing, and dependency injection
 - Repository pattern with remote API and local cache support
 - Dio + Retrofit networking layer
 - Hive persistence for products, cart, and wishlist
@@ -25,14 +25,14 @@ interview.
 
 ## Architecture
 
-ShopKart follows Clean Architecture and MVVM. UI widgets observe Riverpod ViewModels, ViewModels
+ShopKart follows Clean Architecture and MVVM. UI widgets observe GetX Controllers reactively using `Obx`, Controllers
 call use cases or repositories, repositories coordinate remote/local data sources, and domain
 entities remain independent from framework-specific implementation details.
 
 ```mermaid
 flowchart LR
-  UI["Presentation Layer\nScreens, Widgets, ViewModels"] --> VM["Riverpod ViewModels"]
-  VM --> UC["Domain Layer\nUse Cases"]
+  UI["Presentation Layer\nScreens, Widgets, Obx"] --> Controller["GetX Controllers"]
+  Controller --> UC["Domain Layer\nUse Cases"]
   UC --> Contract["Repository Contracts"]
   Contract --> Impl["Data Layer\nRepository Implementations"]
   Impl --> Remote["Remote Data Source\nDio + Retrofit"]
@@ -149,18 +149,15 @@ GET /products/category/{category}
 ## Tech Stack
 
 - Flutter and Dart
-- Riverpod
+- GetX (Reactive State Management, Routing, Dependency Injection)
 - Dio
 - Retrofit
 - Hive
 - SharedPreferences
 - GetIt
-- Injectable
 - Json Serializable
-- Freezed annotations
 - Cached Network Image
 - Shimmer
-- GoRouter
 - Mocktail
 - Flutter Lints
 
@@ -244,7 +241,8 @@ Example Markdown:
 
 - The app separates business rules from UI and data access, making repositories and use cases easy
   to test.
-- Riverpod keeps state explicit and composable without tightly coupling widgets to service classes.
+- GetX provides lightweight reactive state management (`Obx`, `.obs`) without widget tree boilerplate or BuildContext dependencies.
+- GetX Route Management and `GetMiddleware` provide clean navigation guards (e.g., auth redirection) and parameter passing.
 - Repository implementations gracefully fall back to local Hive cache when network calls fail.
 - Cart, wishlist, theme, and auth state persist locally for a better user experience.
 - Feature-based folders keep related code together while preserving Clean Architecture boundaries.

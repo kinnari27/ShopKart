@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get/get.dart';
 import 'package:shop_kart/core/utils/debouncer.dart';
 import 'package:shop_kart/core/widgets/app_empty_state.dart';
 import 'package:shop_kart/core/widgets/shimmer_box.dart';
-import 'package:shop_kart/features/home/presentation/viewmodels/product_list_view_model.dart';
+import 'package:shop_kart/features/home/presentation/controllers/product_list_controller.dart';
 import 'package:shop_kart/features/product/presentation/widgets/product_card.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   final _controller = ScrollController();
   final _debouncer = Debouncer(const Duration(milliseconds: 350));
+  late final ProductListController _productListController;
 
   @override
   void initState() {
     super.initState();
+    _productListController = Get.find<ProductListController>();
     _controller.addListener(() {
       if (_controller.position.extentAfter < 600) {
-        ref.read(productListViewModelProvider.notifier).loadNextPage();
+        _productListController.loadNextPage();
       }
     });
   }
@@ -36,48 +38,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(productListViewModelProvider);
-
     return Scaffold(
       appBar: AppBar(title: const Text('ShopKart')),
-      body: state.when(
-        loading: () => const _HomeSkeleton(),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 54,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Something went wrong',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  error.toString(),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 20),
-                FilledButton.icon(
-                  onPressed: () =>
-                      ref.read(productListViewModelProvider.notifier).refresh(),
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Try Again'),
-                ),
-              ],
+      body: Obx(() {
+        if (_productListController.isLoading.value) {
+          return const _HomeSkeleton();
+        }
+
+        final error = _productListController.errorMessage.value;
+        final data = _productListController.state;
+
+        if (error != null && data.products.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 54,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Something went wrong',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    error,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    onPressed: () => _productListController.loadInitialData(),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Try Again'),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
-        data: (data) => RefreshIndicator(
-          onRefresh: () =>
-              ref.read(productListViewModelProvider.notifier).refresh(),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => _productListController.refreshProducts(),
           child: CustomScrollView(
             controller: _controller,
             slivers: [
@@ -90,9 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       hintText: 'Search products...',
                     ),
                     onChanged: (value) => _debouncer.run(
-                      () => ref
-                          .read(productListViewModelProvider.notifier)
-                          .search(value),
+                      () => _productListController.search(value),
                     ),
                   ),
                 ),
@@ -111,9 +116,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       return ChoiceChip(
                         label: Text(category),
                         selected: data.selectedCategory == category,
-                        onSelected: (_) => ref
-                            .read(productListViewModelProvider.notifier)
-                            .selectCategory(category),
+                        onSelected: (_) =>
+                            _productListController.selectCategory(category),
                       );
                     },
                   ),
@@ -144,8 +148,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
             ],
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

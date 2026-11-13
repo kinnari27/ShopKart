@@ -1,9 +1,5 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:shop_kart/shared/domain/entities/product.dart';
 
-part 'product_model.g.dart';
-
-@JsonSerializable()
 class ProductModel extends Product {
   const ProductModel({
     required super.id,

@@ -7,11 +7,15 @@ import 'package:shop_kart/features/auth/data/repositories/auth_repository_impl.d
 import 'package:shop_kart/features/auth/domain/repositories/auth_repository.dart';
 import 'package:shop_kart/features/cart/data/repositories/cart_repository_impl.dart';
 import 'package:shop_kart/features/cart/domain/repositories/cart_repository.dart';
+import 'package:shop_kart/features/order/data/repositories/order_repository_impl.dart';
+import 'package:shop_kart/features/order/domain/repositories/order_repository.dart';
 import 'package:shop_kart/features/product/data/repositories/product_repository_impl.dart';
 import 'package:shop_kart/features/product/domain/repositories/product_repository.dart';
 import 'package:shop_kart/features/product/domain/usecases/get_categories.dart';
 import 'package:shop_kart/features/product/domain/usecases/get_product_detail.dart';
 import 'package:shop_kart/features/product/domain/usecases/get_products.dart';
+import 'package:shop_kart/features/review/data/repositories/review_repository_impl.dart';
+import 'package:shop_kart/features/review/domain/repositories/review_repository.dart';
 import 'package:shop_kart/features/wishlist/data/repositories/wishlist_repository_impl.dart';
 import 'package:shop_kart/features/wishlist/domain/repositories/wishlist_repository.dart';
 import 'package:shop_kart/shared/data/datasources/product_local_data_source.dart';
@@ -26,6 +30,8 @@ Future<void> configureDependencies() async {
   final listBox = await Hive.openBox<List>('lists');
   final cartBox = await Hive.openBox<Map>('cart');
   final wishlistBox = await Hive.openBox<Map>('wishlist');
+  final ordersBox = await Hive.openBox<Map>('orders');
+  final reviewsBox = await Hive.openBox<Map>('reviews');
 
   sl
     ..registerLazySingleton<SharedPreferences>(() => preferences)
@@ -46,5 +52,11 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<CartRepository>(() => CartRepositoryImpl(cartBox))
     ..registerLazySingleton<WishlistRepository>(
       () => WishlistRepositoryImpl(wishlistBox),
+    )
+    ..registerLazySingleton<OrderRepository>(
+      () => OrderRepositoryImpl(ordersBox),
+    )
+    ..registerLazySingleton<ReviewRepository>(
+      () => ReviewRepositoryImpl(reviewsBox),
     );
 }

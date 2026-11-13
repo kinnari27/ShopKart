@@ -4,11 +4,11 @@ import 'package:shop_kart/shared/domain/entities/product.dart';
 abstract interface class CartRepository {
   List<CartItem> getItems();
 
-  Future<void> add(Product product);
+  Future<void> add(Product product, {String? size});
 
-  Future<void> remove(int productId);
+  Future<void> remove(dynamic productId);
 
-  Future<void> updateQuantity(int productId, int quantity);
+  Future<void> updateQuantity(dynamic productId, int quantity);
 
   Future<void> clear();
 }

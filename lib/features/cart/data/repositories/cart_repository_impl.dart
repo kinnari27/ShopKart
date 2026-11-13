@@ -17,26 +17,32 @@ class CartRepositoryImpl implements CartRepository {
         Map<String, dynamic>.from(map['product'] as Map),
       ),
       quantity: map['quantity'] as int,
+      size: map['size'] as String?,
     );
   }).toList();
 
   @override
-  Future<void> add(Product product) async {
-    final existing = _box.get(product.id);
+  Future<void> add(Product product, {String? size}) async {
+    final key = size != null ? '${product.id}_$size' : product.id;
+    final existing = _box.get(key) ?? (size == null ? _box.get(product.id) : null);
     final quantity = existing == null
         ? 1
         : (Map<String, dynamic>.from(existing)['quantity'] as int) + 1;
-    await _box.put(product.id, {
+    final payload = <String, dynamic>{
       'product': _toMap(product),
       'quantity': quantity,
-    });
+    };
+    if (size != null) {
+      payload['size'] = size;
+    }
+    await _box.put(key, payload);
   }
 
   @override
-  Future<void> remove(int productId) => _box.delete(productId);
+  Future<void> remove(dynamic productId) => _box.delete(productId);
 
   @override
-  Future<void> updateQuantity(int productId, int quantity) async {
+  Future<void> updateQuantity(dynamic productId, int quantity) async {
     if (quantity <= 0) return remove(productId);
     final existing = _box.get(productId);
     if (existing == null) return;

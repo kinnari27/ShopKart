@@ -6,6 +6,8 @@ import 'package:shop_kart/core/routing/dashboard_screen.dart';
 import 'package:shop_kart/features/auth/presentation/screens/login_screen.dart';
 import 'package:shop_kart/features/auth/presentation/screens/register_screen.dart';
 import 'package:shop_kart/features/cart/presentation/screens/cart_screen.dart';
+import 'package:shop_kart/features/order/presentation/screens/order_list_screen.dart';
+import 'package:shop_kart/features/order/presentation/screens/order_tracking_screen.dart';
 import 'package:shop_kart/features/product/presentation/screens/product_detail_screen.dart';
 import 'package:shop_kart/features/profile/presentation/screens/profile_screen.dart';
 import 'package:shop_kart/features/wishlist/presentation/screens/wishlist_screen.dart';
@@ -47,6 +49,14 @@ class AppPages {
         final id = idParam != null ? int.parse(idParam) : (Get.arguments as int? ?? 1);
         return ProductDetailScreen(productId: id);
       },
+    ),
+    GetPage(
+      name: AppRoutes.orders,
+      page: () => const OrderListScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.orderTracking,
+      page: () => const OrderTrackingScreen(),
     ),
   ];
 }

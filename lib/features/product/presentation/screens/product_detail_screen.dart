@@ -5,6 +5,7 @@ import 'package:shop_kart/core/routing/app_routes.dart';
 import 'package:shop_kart/core/widgets/shimmer_box.dart';
 import 'package:shop_kart/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:shop_kart/features/product/presentation/controllers/product_detail_controller.dart';
+import 'package:shop_kart/features/review/presentation/widgets/review_sheet.dart';
 import 'package:shop_kart/features/wishlist/presentation/controllers/wishlist_controller.dart';
 
 class ProductDetailScreen extends StatelessWidget {
@@ -155,14 +156,58 @@ class ProductDetailScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(
-                  Icons.star_rounded,
-                  color: Theme.of(context).colorScheme.tertiary,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${product.rating} (${product.ratingCount} reviews)',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => ReviewSheet.showReviews(
+                    context,
+                    detailController,
+                    product,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 2,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(width: 4),
+                        Obx(() {
+                          final p = detailController.product.value ?? product;
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '${p.rating}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '(${p.ratingCount} reviews)',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
                 ),
                 const Spacer(),
                 Text(
@@ -181,24 +226,121 @@ class ProductDetailScreen extends StatelessWidget {
                     height: 1.5,
                   ),
             ),
-            const SizedBox(height: 28),
-            FilledButton.icon(
-              onPressed: () {
-                cartController.add(product);
-                Get.snackbar(
-                  'Added to bag',
-                  product.title,
-                  snackPosition: SnackPosition.BOTTOM,
-                  mainButton: TextButton(
-                    onPressed: () => Get.toNamed(AppRoutes.cart),
-                    child: const Text('View Bag'),
+            if (product.isClothing) ...[
+              const SizedBox(height: 22),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Select Size',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
-                );
-              },
-              icon: const Icon(Icons.shopping_bag_outlined),
-              label: const Text('Add to bag'),
-            ),
+                  Obx(
+                    () => Text(
+                      'Size: ${detailController.selectedSize.value}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Obx(
+                () => SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: product.availableSizes.map((size) {
+                      final isSelected =
+                          detailController.selectedSize.value == size;
+                      final colors = Theme.of(context).colorScheme;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: InkWell(
+                          onTap: () => detailController.selectSize(size),
+                          borderRadius: BorderRadius.circular(10),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 50,
+                            height: 44,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? colors.primary
+                                  : colors.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isSelected
+                                    ? colors.primary
+                                    : colors.outlineVariant.withAlpha(80),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Text(
+                              size,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? colors.onPrimary
+                                    : colors.onSurface,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
           ],
+        );
+      }),
+      bottomNavigationBar: Obx(() {
+        final product = detailController.product.value;
+        if (product == null || detailController.isLoading.value) {
+          return const SizedBox.shrink();
+        }
+
+        return SafeArea(
+          minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: FilledButton.icon(
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () {
+              final size = product.isClothing
+                  ? detailController.selectedSize.value
+                  : null;
+              cartController.add(product, size: size);
+              Get.snackbar(
+                'Added to bag',
+                size != null
+                    ? '${product.title} (Size: $size)'
+                    : product.title,
+                snackPosition: SnackPosition.BOTTOM,
+                mainButton: TextButton(
+                  onPressed: () => Get.toNamed(AppRoutes.cart),
+                  child: const Text('View Bag'),
+                ),
+              );
+            },
+            icon: const Icon(Icons.shopping_bag_outlined),
+            label: const Text(
+              'Add to bag',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
         );
       }),
     );

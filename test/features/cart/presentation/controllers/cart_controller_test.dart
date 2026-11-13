@@ -44,7 +44,8 @@ void main() {
   });
 
   test('add should delegate to repository and update state', () async {
-    when(() => mockRepository.add(tProduct)).thenAnswer((_) async {});
+    when(() => mockRepository.add(tProduct, size: any(named: 'size')))
+        .thenAnswer((_) async {});
     when(() => mockRepository.getItems()).thenReturn([
       tCartItem.copyWith(quantity: 3),
     ]);
@@ -52,7 +53,19 @@ void main() {
     await controller.add(tProduct);
 
     expect(controller.items.first.quantity, 3);
-    verify(() => mockRepository.add(tProduct)).called(1);
+    verify(() => mockRepository.add(tProduct, size: any(named: 'size'))).called(1);
+  });
+
+  test('add with size should delegate to repository with size', () async {
+    when(() => mockRepository.add(tProduct, size: 'L')).thenAnswer((_) async {});
+    when(() => mockRepository.getItems()).thenReturn([
+      tCartItem.copyWith(size: 'L'),
+    ]);
+
+    await controller.add(tProduct, size: 'L');
+
+    expect(controller.items.first.size, 'L');
+    verify(() => mockRepository.add(tProduct, size: 'L')).called(1);
   });
 
   test('remove should delegate to repository and update state', () async {

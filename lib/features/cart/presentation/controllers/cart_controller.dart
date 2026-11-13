@@ -23,17 +23,17 @@ class CartController extends GetxController {
     items.assignAll(_repository.getItems());
   }
 
-  Future<void> add(Product product) async {
-    await _repository.add(product);
+  Future<void> add(Product product, {String? size}) async {
+    await _repository.add(product, size: size);
     items.assignAll(_repository.getItems());
   }
 
-  Future<void> remove(int productId) async {
+  Future<void> remove(dynamic productId) async {
     await _repository.remove(productId);
     items.assignAll(_repository.getItems());
   }
 
-  Future<void> updateQuantity(int productId, int quantity) async {
+  Future<void> updateQuantity(dynamic productId, int quantity) async {
     await _repository.updateQuantity(productId, quantity);
     items.assignAll(_repository.getItems());
   }

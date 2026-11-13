@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shop_kart/core/routing/app_routes.dart';
 import 'package:shop_kart/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:shop_kart/features/profile/presentation/controllers/theme_controller.dart';
 
@@ -24,6 +25,23 @@ class ProfileScreen extends StatelessWidget {
               leading: const CircleAvatar(child: Icon(Icons.person_outline)),
               title: Text(user?.name ?? 'Guest'),
               subtitle: Text(user?.email ?? ''),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.local_shipping_outlined),
+                title: const Text('My Orders & Tracking'),
+                subtitle: const Text('View history and track ongoing deliveries'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Get.toNamed(AppRoutes.orders),
+              ),
             ),
             const SizedBox(height: 16),
             SegmentedButton<ThemeMode>(

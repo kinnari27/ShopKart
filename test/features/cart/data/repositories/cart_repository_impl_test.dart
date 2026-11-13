@@ -79,6 +79,19 @@ void main() {
     )))).called(1);
   });
 
+  test('add with size should use composite key and store size', () async {
+    when(() => mockBox.get('1_M')).thenReturn(null);
+    when(() => mockBox.put(any(), any())).thenAnswer((_) async {});
+
+    await repository.add(tProduct, size: 'M');
+
+    verify(() => mockBox.put('1_M', any(that: isA<Map>().having(
+      (m) => m['size'],
+      'size',
+      'M',
+    )))).called(1);
+  });
+
   test('updateQuantity should update quantity when > 0', () async {
     when(() => mockBox.get(1)).thenReturn({'quantity': 1, 'product': {}});
     when(() => mockBox.put(any(), any())).thenAnswer((_) async {});

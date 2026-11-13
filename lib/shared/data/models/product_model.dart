@@ -16,15 +16,16 @@ class ProductModel extends Product {
     required super.ratingCount,
   });
 
-  factory ProductModel.fromJson(Map<String, dynamic> json) {
-    final rating = json['rating'] as Map<String, dynamic>? ?? const {};
+  factory ProductModel.fromJson(Map<dynamic, dynamic> json) {
+    final ratingRaw = json['rating'];
+    final rating = ratingRaw is Map ? ratingRaw : const {};
     return ProductModel(
-      id: json['id'] as int,
-      title: json['title'] as String,
+      id: (json['id'] as num).toInt(),
+      title: json['title'] as String? ?? '',
       price: (json['price'] as num).toDouble(),
-      description: json['description'] as String,
-      category: json['category'] as String,
-      image: json['image'] as String,
+      description: json['description'] as String? ?? '',
+      category: json['category'] as String? ?? '',
+      image: json['image'] as String? ?? '',
       rating: ((rating['rate'] ?? 0) as num).toDouble(),
       ratingCount: ((rating['count'] ?? 0) as num).toInt(),
     );

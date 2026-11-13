@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shop_kart/core/routing/app_routes.dart';
 import 'package:shop_kart/core/widgets/app_empty_state.dart';
 import 'package:shop_kart/features/cart/presentation/controllers/cart_controller.dart';
+import 'package:shop_kart/features/order/presentation/controllers/order_controller.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -37,29 +39,38 @@ class CartScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Order Summary',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Items ($count)', style: Theme.of(context).textTheme.bodyMedium),
-                  Text('\$${total.toStringAsFixed(2)}', style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    'Items ($count)',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  Text(
+                    '\$${total.toStringAsFixed(2)}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Delivery', style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    'Delivery',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                   Text(
                     'FREE',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -70,26 +81,34 @@ class CartScreen extends StatelessWidget {
                   Text(
                     'Total',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
                     '\$${total.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
               FilledButton.icon(
-                onPressed: () {
-                  controller.clear();
-                  Navigator.of(bottomSheetContext).pop();
+                onPressed: () async {
+                  final orderController = Get.find<OrderController>();
+                  final order = await orderController.placeOrder(
+                    items: controller.items.toList(),
+                    total: total,
+                  );
+                  await controller.clear();
+                  if (context.mounted) {
+                    Navigator.of(bottomSheetContext).pop();
+                  }
+                  Get.toNamed(AppRoutes.orderTracking, arguments: order.id);
                   Get.snackbar(
-                    'Order Placed',
-                    'Order placed successfully! Thank you for shopping with ShopKart.',
+                    'Order Placed! 🎉',
+                    'Order #${order.id} placed successfully. You can track delivery status below.',
                     snackPosition: SnackPosition.BOTTOM,
                     margin: const EdgeInsets.all(16),
                   );
@@ -137,7 +156,7 @@ class CartScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = items[index];
                   return Dismissible(
-                    key: ValueKey('cart_item_${item.product.id}'),
+                    key: ValueKey('cart_item_${item.cartKey}'),
                     direction: DismissDirection.endToStart,
                     background: Container(
                       alignment: Alignment.centerRight,
@@ -148,12 +167,11 @@ class CartScreen extends StatelessWidget {
                       ),
                       child: Icon(
                         Icons.delete_outline,
-                        color:
-                            Theme.of(context).colorScheme.onErrorContainer,
+                        color: Theme.of(context).colorScheme.onErrorContainer,
                       ),
                     ),
                     onDismissed: (_) {
-                      controller.remove(item.product.id);
+                      controller.remove(item.cartKey);
                     },
                     child: ListTile(
                       tileColor: Theme.of(
@@ -172,18 +190,47 @@ class CartScreen extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      subtitle:
+                      subtitle: Row(
+                        children: [
                           Text('\$${item.product.price.toStringAsFixed(2)}'),
+                          if (item.size != null) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'Size: ${item.size}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                       trailing: Wrap(
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           IconButton(
                             onPressed: () => controller.updateQuantity(
-                              item.product.id,
+                              item.cartKey,
                               item.quantity - 1,
                             ),
-                            icon:
-                                const Icon(Icons.remove_circle_outline_rounded),
+                            icon: const Icon(
+                              Icons.remove_circle_outline_rounded,
+                            ),
                           ),
                           Text(
                             '${item.quantity}',
@@ -191,7 +238,7 @@ class CartScreen extends StatelessWidget {
                           ),
                           IconButton(
                             onPressed: () => controller.updateQuantity(
-                              item.product.id,
+                              item.cartKey,
                               item.quantity + 1,
                             ),
                             icon: const Icon(Icons.add_circle_outline_rounded),

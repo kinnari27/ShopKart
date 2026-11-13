@@ -49,4 +49,23 @@ void main() {
     expect(result.rating, 0.0);
     expect(result.ratingCount, 0);
   });
+
+  test('fromJson should handle Map<dynamic, dynamic> rating from Hive', () {
+    final Map<dynamic, dynamic> hiveRating = <dynamic, dynamic>{
+      'rate': 4.8,
+      'count': 95,
+    };
+    final jsonWithDynamicRating = <String, dynamic>{
+      'id': 2,
+      'title': 'Hive Item',
+      'price': 49.99,
+      'description': 'Item from Hive',
+      'category': 'jewelery',
+      'image': 'https://example.com/item.png',
+      'rating': hiveRating,
+    };
+    final result = ProductModel.fromJson(jsonWithDynamicRating);
+    expect(result.rating, 4.8);
+    expect(result.ratingCount, 95);
+  });
 }
